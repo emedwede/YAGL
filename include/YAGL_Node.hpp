@@ -37,7 +37,8 @@ namespace YAGL
 	};
 
 	template <typename KeyType, typename DataType>
-	Node<KeyType, DataType>::Node(const KeyType, const DataType& data)
+	Node<KeyType, DataType>::Node(const KeyType k, const DataType& d)
+	: key(k), data(d) //TODO: possibly make it a move
 	{
 		
 	}
@@ -70,3 +71,5 @@ namespace YAGL
 	}
 
 } //end namespace YAGL
+
+#endif
