@@ -24,4 +24,6 @@ TEST_CASE("Running Node Test", "[node test]")
     REQUIRE(node.getKey() == key);
 
     REQUIRE(node.getData() == data);
+
+    std::cout << node;
 }
