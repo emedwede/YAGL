@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/node-test.dir/tests_main.cpp.o CMakeFiles/node-test.dir/node-test.cpp.o  -o node-test 
