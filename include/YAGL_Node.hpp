@@ -11,7 +11,7 @@ namespace YAGL
 	class Node;
 
 	template <typename KeyType, typename DataType>
-	std::ostream &operator<<(std::ostream& os, const Node<KeyType, DataType>& node);
+	std::ostream& operator<<(std::ostream& os, const Node<KeyType, DataType>& node);
 
 	template <typename KeyType, typename DataType>
 	class Node
@@ -66,7 +66,8 @@ namespace YAGL
 	{
 		os << "Node: {\n"
 			 << "\tKey:\t" << node.key << "\n"
-			 << "\tData:\t" << node.data << "\n";
+			 << "\tData:\t" << node.data << "\n"
+			 << "}\n";
 		return os;
 	}
 
