@@ -45,14 +45,16 @@ namespace YAGL
 			using adjaceny_list_type = std::unordered_map<key_type, in_out_nbr_type>;
 			using node_list_type = std::unordered_map<key_type, node_type>;
 
-			// by default count with the largest unsigned type
-			using counting_type = std::size_t;
+			// by default count with the containers size_type
+			using counting_type = typename node_list_type::size_type;
 
 			//TODO: define any useful iterators
 			
 		private:
 			node_list_type node_list;
 			adjaceny_list_type adjaceny_list;	
+			
+			bool undirected;
 
 		public:
 			Graph();
@@ -75,11 +77,11 @@ namespace YAGL
 
 			void getNodeSet();
 
-			void addNode();
+			void addNode(const Node<KeyType, DataType>& node);
 			
-			void removeNode();
+			void removeNode(const Node<KeyType, DataType>& node);
 			
-			void numNodes();
+			counting_type numNodes();
 
 			void numEdges();
 
@@ -94,6 +96,8 @@ namespace YAGL
 	Graph<KeyType, DataType>::Graph()
 	{
 		std::cout << "Default graph constructor!\n";
+
+		//node_list.reserve(20'000'000);
 	}
 
 	template <typename KeyType, typename DataType>
@@ -151,21 +155,22 @@ namespace YAGL
 	}
 
 	template <typename KeyType, typename DataType>
-	void Graph<KeyType, DataType>::addNode()
+	void Graph<KeyType, DataType>::addNode(const Node<KeyType, DataType>& node)
 	{
-
+		//node_list.insert({node.getKey(), node});
+		node_list.insert_or_assign(node.getKey(), node);
 	}
 
 	template <typename KeyType, typename DataType>
-	void Graph<KeyType, DataType>::removeNode()
+	void Graph<KeyType, DataType>::removeNode(const Node<KeyType, DataType>& node)
 	{
-
+		node_list.erase(node.getKey());
 	}
 
 	template <typename KeyType, typename DataType>
-	void Graph<KeyType, DataType>::numNodes()
+	typename Graph<KeyType, DataType>::counting_type Graph<KeyType, DataType>::numNodes()
 	{
-
+		return node_list.size(); 
 	}
 
 	template <typename KeyType, typename DataType>
