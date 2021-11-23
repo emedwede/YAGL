@@ -44,12 +44,26 @@ TEST_CASE("Running Graph Test", "[graph test]")
     REQUIRE(graph.numNodes() == 1);
    
     //TODO: add graph.clear()
-    //
+    
+    graph_type graph_perf;
+
     //TODO: add this to a performance test
-    std::size_t num_adds = 10'000'000;
+    std::size_t num_adds = 10'000;
     for(auto i = 0; i < num_adds; i++) {
         node_type n(i, i*1.1);
-        graph.addNode(n);
+        graph_perf.addNode(n);
     }
-    REQUIRE(graph.numNodes() == num_adds);
+    
+    REQUIRE(graph_perf.numNodes() == num_adds);
+    
+    REQUIRE( graph_perf.findNode(100'000) == graph_perf.node_list_end() );
+    
+    auto search = graph_perf.findNode(101);
+    auto node_d = search->second;
+    
+    REQUIRE(search != graph_perf.node_list_end());
+    REQUIRE( node_d.getData() == node_d.getKey()*1.1 );
+    
+    auto nbr_list = graph_perf.out_neighbors(node_d);
+    REQUIRE(nbr_list.size() == 0);
 }

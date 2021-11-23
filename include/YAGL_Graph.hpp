@@ -9,6 +9,7 @@
 #include <utility> // for pair 
 
 #include "YAGL_Node.hpp"
+#include "YAGL_Edge.hpp"
 
 namespace YAGL 
 {
@@ -28,7 +29,7 @@ namespace YAGL
 			using key_type = KeyType;
 			using data_type = DataType;
 			using node_type = Node<key_type, data_type>;
-			using edge_type = char; // TODO: remove placeholder
+			using edge_type = Edge<key_type, data_type>;
 			
 			// Motivation: unordered_set allows for amortized time
 			// 						 constant looup, and ensures keys are unique
@@ -42,7 +43,7 @@ namespace YAGL
 			using in_out_nbr_type = std::pair<node_set_type, node_set_type>;
 			
 			// Motivation: simliar to the node and edge_set types
-			using adjaceny_list_type = std::unordered_map<key_type, in_out_nbr_type>;
+			using adjacency_list_type = std::unordered_map<key_type, in_out_nbr_type>;
 			using node_list_type = std::unordered_map<key_type, node_type>;
 			using edge_list_type = std::unordered_multimap<key_type, edge_type>;
 
@@ -50,10 +51,22 @@ namespace YAGL
 			using counting_type = typename node_list_type::size_type;
 
 			//TODO: define any useful iterators
+			using node_iterator = typename node_list_type::iterator;
+			using const_node_iterator = typename node_list_type::const_iterator;
+
+			using edge_iterator = typename edge_list_type::iterator;
+			using const_edge_iterator = typename edge_list_type::const_iterator;
 			
+			using adjacency_iterator = typename adjacency_list_type::iterator;
+			using const_adjacency_iterator = typename adjacency_list_type::const_iterator;
+			
+			using node_set_nbr_iterator = typename node_set_type::iterator;
+			using const_node_set_nbr_iterator = typename node_set_type::const_iterator;
+
 		private:
 			node_list_type node_list;
-			adjaceny_list_type adjaceny_list;	
+			edge_list_type edge_list;
+			adjacency_list_type adjaceny_list;	
 			
 			bool undirected;
 
@@ -62,6 +75,24 @@ namespace YAGL
 
 			Graph(const DataType placeholder);
 			
+			node_iterator node_list_begin();
+			node_iterator node_list_end();
+
+			edge_iterator edge_list_begin();
+			edge_iterator edge_list_end();
+
+			adjacency_iterator adjacency_list_begin();
+			adjacency_iterator adjacency_list_end();
+			
+			node_set_nbr_iterator out_neighbors_begin(const Node<KeyType, DataType>& node);
+			node_set_nbr_iterator out_neighbors_end(const Node<KeyType, DataType>& node);
+
+			node_set_nbr_iterator in_neighbors_begin(const Node<KeyType, DataType>& node);
+			node_set_nbr_iterator in_neighbors_end(const Node<KeyType, DataType>& node);
+			
+			node_set_type& out_neighbors(const Node<KeyType, DataType>& node);
+			node_set_type& in_neighbors(const Node<KeyType, DataType>& node);
+
 			void setEdgeset(/* Needs to take in an edge set*/);
 			
 			void getEdgeset();
@@ -70,7 +101,7 @@ namespace YAGL
 			
 			void setEdge();
 
-			void addEdge(/* Takes EdgeType*/);
+			void addEdge(const Node<KeyType, DataType>& node_a, const Node<KeyType, DataType>& node_b);
 
 			void removeEdge();
 			
@@ -82,6 +113,8 @@ namespace YAGL
 			
 			void removeNode(const Node<KeyType, DataType>& node);
 			
+			node_iterator findNode(KeyType k);
+
 			counting_type numNodes();
 
 			void numEdges();
@@ -105,6 +138,84 @@ namespace YAGL
 	Graph<KeyType, DataType>::Graph(const DataType placeholder)
 	{
 		std::cout << "Overloaded graph const!\n";
+	}
+	
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_iterator Graph<KeyType, DataType>::node_list_begin()
+	{
+		return node_list.begin();		
+	}
+
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_iterator Graph<KeyType, DataType>::node_list_end()
+	{
+		return node_list.end();	
+	}
+
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::edge_iterator Graph<KeyType, DataType>::edge_list_begin()
+	{
+		return edge_list.begin();	
+	}
+
+template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::edge_iterator Graph<KeyType, DataType>::edge_list_end()
+	{
+		return edge_list.end();	
+	}
+
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::adjacency_iterator Graph<KeyType, DataType>::adjacency_list_begin()
+	{
+		return adjaceny_list.begin();	
+	}
+
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::adjacency_iterator Graph<KeyType, DataType>::adjacency_list_end()
+	{
+		return adjaceny_list.end();	
+	}
+
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_set_nbr_iterator 
+	Graph<KeyType, DataType>::out_neighbors_begin(const Node<KeyType, DataType> &node)
+	{
+		return out_neighbors(node).begin();
+	}
+	
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_set_nbr_iterator
+	Graph<KeyType, DataType>::out_neighbors_end(const Node<KeyType, DataType> &node)
+	{
+		return out_neighbors(node).end();
+	}
+
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_set_type& 
+	Graph<KeyType, DataType>::out_neighbors(const Node<KeyType, DataType> &node)
+	{
+		return adjaceny_list.find(node.getKey())->second.first; 
+	}
+
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_set_nbr_iterator 
+	Graph<KeyType, DataType>::in_neighbors_begin(const Node<KeyType, DataType> &node)
+	{
+		return in_neighbors(node).begin();
+	}
+
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_set_nbr_iterator
+	Graph<KeyType, DataType>::in_neighbors_end(const Node<KeyType, DataType> &node)
+	{
+		return in_neighbors(node).end();
+	}
+	
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_set_type&
+	Graph<KeyType, DataType>::in_neighbors(const Node<KeyType, DataType> &node)
+	{
+		return adjaceny_list.find(node.getData())->second.second;
 	}
 
 	template <typename KeyType, typename DataType>
@@ -132,9 +243,10 @@ namespace YAGL
 	}
 
 	template <typename KeyType, typename DataType>
-	void Graph<KeyType, DataType>::addEdge()
+	void Graph<KeyType, DataType>::addEdge(const Node<KeyType, DataType>& node_a,
+																				 const Node<KeyType, DataType>& node_b)
 	{
-
+		//we don't do any constraint checks for self-directed edges 
 	}
 
 	template <typename KeyType, typename DataType>
@@ -160,12 +272,20 @@ namespace YAGL
 	{
 		//node_list.insert({node.getKey(), node});
 		node_list.insert_or_assign(node.getKey(), node);
+		adjaceny_list[node.getKey()]; //TODO: is there a better way to default initialize
 	}
 
 	template <typename KeyType, typename DataType>
 	void Graph<KeyType, DataType>::removeNode(const Node<KeyType, DataType>& node)
 	{
 		node_list.erase(node.getKey());
+		adjaceny_list.erase(node.getKey());
+	}
+	
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_iterator Graph<KeyType, DataType>::findNode(KeyType k)
+	{
+			return node_list.find(k);
 	}
 
 	template <typename KeyType, typename DataType>
