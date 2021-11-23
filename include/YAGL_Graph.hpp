@@ -44,6 +44,7 @@ namespace YAGL
 			// Motivation: simliar to the node and edge_set types
 			using adjaceny_list_type = std::unordered_map<key_type, in_out_nbr_type>;
 			using node_list_type = std::unordered_map<key_type, node_type>;
+			using edge_list_type = std::unordered_multimap<key_type, edge_type>;
 
 			// by default count with the containers size_type
 			using counting_type = typename node_list_type::size_type;
