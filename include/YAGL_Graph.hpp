@@ -66,9 +66,10 @@ namespace YAGL
 		private:
 			node_list_type node_list;
 			edge_list_type edge_list;
-			adjacency_list_type adjaceny_list;	
+			adjacency_list_type adjacency_list;	
 			
 			bool undirected;
+			counting_type num_edges;
 
 		public:
 			Graph();
@@ -103,7 +104,7 @@ namespace YAGL
 
 			void addEdge(const Node<KeyType, DataType>& node_a, const Node<KeyType, DataType>& node_b);
 
-			void removeEdge();
+			void removeEdge(const Node<KeyType, DataType>& node_a, const Node<KeyType, DataType>& node_b);
 			
 			void setNodeSet();
 
@@ -117,17 +118,23 @@ namespace YAGL
 
 			counting_type numNodes();
 
-			void numEdges();
+			counting_type numEdges();
+			
+			counting_type in_degree(const Node<KeyType, DataType>& node);
+			
+			counting_type out_degree(const Node<KeyType, DataType>& node);
 
-			void isDirected();
+			counting_type degree(const Node<KeyType, DataType>& node);
 
-			void isUndirected();
+			bool isDirected();
+
+			bool isUndirected();
 			
 			friend std::ostream &operator<<<>(std::ostream& os, const Graph<KeyType, DataType>& graph);
 	};
 	
 	template <typename KeyType, typename DataType>
-	Graph<KeyType, DataType>::Graph()
+	Graph<KeyType, DataType>::Graph() : undirected(true), num_edges(0)
 	{
 		std::cout << "Default graph constructor!\n";
 
@@ -167,13 +174,13 @@ template <typename KeyType, typename DataType>
 	template <typename KeyType, typename DataType>
 	typename Graph<KeyType, DataType>::adjacency_iterator Graph<KeyType, DataType>::adjacency_list_begin()
 	{
-		return adjaceny_list.begin();	
+		return adjacency_list.begin();	
 	}
 
 	template <typename KeyType, typename DataType>
 	typename Graph<KeyType, DataType>::adjacency_iterator Graph<KeyType, DataType>::adjacency_list_end()
 	{
-		return adjaceny_list.end();	
+		return adjacency_list.end();	
 	}
 
 	template <typename KeyType, typename DataType>
@@ -194,7 +201,7 @@ template <typename KeyType, typename DataType>
 	typename Graph<KeyType, DataType>::node_set_type& 
 	Graph<KeyType, DataType>::out_neighbors(const Node<KeyType, DataType> &node)
 	{
-		return adjaceny_list.find(node.getKey())->second.first; 
+		return adjacency_list.find(node.getKey())->second.first; 
 	}
 
 	template <typename KeyType, typename DataType>
@@ -215,7 +222,7 @@ template <typename KeyType, typename DataType>
 	typename Graph<KeyType, DataType>::node_set_type&
 	Graph<KeyType, DataType>::in_neighbors(const Node<KeyType, DataType> &node)
 	{
-		return adjaceny_list.find(node.getData())->second.second;
+		return adjacency_list.find(node.getKey())->second.second;
 	}
 
 	template <typename KeyType, typename DataType>
@@ -247,12 +254,70 @@ template <typename KeyType, typename DataType>
 																				 const Node<KeyType, DataType>& node_b)
 	{
 		//we don't do any constraint checks for self-directed edges 
+		auto iter_a = findNode(node_a.getKey());
+		if(iter_a == node_list_end())
+		{
+			addNode(node_a);
+		}
+
+		auto iter_b = findNode(node_b.getKey());
+		if(iter_b == node_list_end())
+		{
+			addNode(node_b);
+		}
+		
+		auto old_size_a = out_neighbors(node_a).size();
+		auto old_size_b = out_neighbors(node_b).size();
+
+		out_neighbors(node_a).insert(node_b.getKey());
+		in_neighbors(node_a).insert(node_b.getKey());
+
+		out_neighbors(node_b).insert(node_a.getKey());
+		in_neighbors(node_b).insert(node_a.getKey());
+
+		auto new_size_a = out_neighbors(node_a).size();
+		auto new_size_b = out_neighbors(node_b).size();
+		
+		if(new_size_a > old_size_a && new_size_b > old_size_b) 
+		{
+			num_edges++;
+		}
+
 	}
 
 	template <typename KeyType, typename DataType>
-	void Graph<KeyType, DataType>::removeEdge()
+	void Graph<KeyType, DataType>::removeEdge(const Node<KeyType, DataType>& node_a,
+																						const Node<KeyType, DataType>& node_b)
 	{
+		//we don't do any constraint checks for self-directed edges 
+		auto iter_a = findNode(node_a.getKey());
+		if(iter_a == node_list_end())
+		{
+			return; //cannot remove what does not exist
+		}
 
+		auto iter_b = findNode(node_b.getKey());
+		if(iter_b == node_list_end())
+		{
+			return; //cannot remove what does not exist
+		}
+		
+		auto old_size_a = out_neighbors(node_a).size();
+		auto old_size_b = out_neighbors(node_b).size();
+
+		out_neighbors(node_a).erase(node_b.getKey());
+		in_neighbors(node_a).erase(node_b.getKey());
+
+		out_neighbors(node_b).erase(node_a.getKey());
+		in_neighbors(node_b).erase(node_a.getKey());
+
+		auto new_size_a = out_neighbors(node_a).size();
+		auto new_size_b = out_neighbors(node_b).size();
+		
+		if(new_size_a < old_size_a && new_size_b < old_size_b) 
+		{
+			num_edges--;
+		}
 	}
 
 	template <typename KeyType, typename DataType>
@@ -272,14 +337,16 @@ template <typename KeyType, typename DataType>
 	{
 		//node_list.insert({node.getKey(), node});
 		node_list.insert_or_assign(node.getKey(), node);
-		adjaceny_list[node.getKey()]; //TODO: is there a better way to default initialize
+		adjacency_list[node.getKey()]; //TODO: is there a better way to default initialize
 	}
 
 	template <typename KeyType, typename DataType>
 	void Graph<KeyType, DataType>::removeNode(const Node<KeyType, DataType>& node)
 	{
 		node_list.erase(node.getKey());
-		adjaceny_list.erase(node.getKey());
+
+		//TODO: add removal of edges pointing to it
+		adjacency_list.erase(node.getKey());
 	}
 	
 	template <typename KeyType, typename DataType>
@@ -295,21 +362,42 @@ template <typename KeyType, typename DataType>
 	}
 
 	template <typename KeyType, typename DataType>
-	void Graph<KeyType, DataType>::numEdges()
+	typename Graph<KeyType, DataType>::counting_type Graph<KeyType, DataType>::numEdges()
 	{
-
+		return num_edges;
 	}
 
 	template <typename KeyType, typename DataType>
-	void Graph<KeyType, DataType>::isDirected()
+	typename Graph<KeyType, DataType>::counting_type 
+	Graph<KeyType, DataType>::in_degree(const Node<KeyType, DataType> &node) 
 	{
-
+		return in_neighbors(node).size();
 	}
 
 	template <typename KeyType, typename DataType>
-	void Graph<KeyType, DataType>::isUndirected()
+	typename Graph<KeyType, DataType>::counting_type 
+	Graph<KeyType, DataType>::out_degree(const Node<KeyType, DataType> &node) 
 	{
+		return out_neighbors(node).size();
+	}
+	
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::counting_type 
+	Graph<KeyType, DataType>::degree(const Node<KeyType, DataType> &node) 
+	{
+		return out_neighbors(node).size();
+	}
 
+	template <typename KeyType, typename DataType>
+	bool Graph<KeyType, DataType>::isDirected()
+	{
+		return !undirected;
+	}
+
+	template <typename KeyType, typename DataType>
+	bool Graph<KeyType, DataType>::isUndirected()
+	{
+		return undirected;
 	}
 
 	template <typename KeyType, typename DataType>

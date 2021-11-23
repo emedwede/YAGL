@@ -32,16 +32,40 @@ TEST_CASE("Running Graph Test", "[graph test]")
     key_type key_c = 2;
     data_type data_c = 2.6;
     node_type node_c(key_c, data_c);
-
+    
+    key_type key_e = 3;
+    data_type data_e = 4.2;
+    node_type node_e(key_e, data_e);
     graph.addNode(node_a);
     graph.addNode(node_b);
     graph.addNode(node_c);
+    graph.addNode(node_e);
 
-    REQUIRE(graph.numNodes() == 2);
+    REQUIRE(graph.numNodes() == 3);
+    
+    graph.addEdge(node_a, node_c);
+    REQUIRE( graph.in_degree(node_a) == 1 );
+    REQUIRE( graph.out_degree(node_a) == 1 );
+    REQUIRE( graph.in_degree(node_c) == 1 );
+    REQUIRE( graph.out_degree(node_c) == 1 );
+    
+    REQUIRE( graph.numEdges() == 1 );
+
+    graph.addEdge(node_a, node_e);
+    REQUIRE( graph.in_degree(node_a) == 2 );
+    REQUIRE( graph.out_degree(node_a) == 2 );
+    REQUIRE( graph.in_degree(node_e) == 1 );
+    REQUIRE( graph.out_degree(node_e) == 1 );
+
+    REQUIRE(graph.numEdges() == 2);
+
+    graph.removeEdge(node_e, node_a);
+    
+    REQUIRE(graph.numEdges() == 1);
 
     graph.removeNode(node_c);
 
-    REQUIRE(graph.numNodes() == 1);
+    REQUIRE(graph.numNodes() == 2);
    
     //TODO: add graph.clear()
     
