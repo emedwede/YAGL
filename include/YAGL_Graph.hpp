@@ -350,10 +350,25 @@ template <typename KeyType, typename DataType>
 	template <typename KeyType, typename DataType>
 	void Graph<KeyType, DataType>::removeNode(const Node<KeyType, DataType>& node)
 	{
-		node_list.erase(node.getKey());
+		auto out_set = out_neighbors(node);
+		auto in_set = in_neighbors(node);
+		std::cout << "out_set: ";
+		for(auto& elem : out_set)
+		{
+			auto n =findNode(elem)->second;
+			removeEdge(n, node);
+		}
+		for(auto& elem : in_set)
+		{
+			//TODO: is this redundant?
+			auto n =findNode(elem)->second;
+			removeEdge(n, node);
+		}
 
 		//TODO: add removal of edges pointing to it
 		adjacency_list.erase(node.getKey());
+
+		node_list.erase(node.getKey());
 	}
 	
 	template <typename KeyType, typename DataType>
