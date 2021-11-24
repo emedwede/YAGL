@@ -66,7 +66,9 @@ TEST_CASE("Running Graph Test", "[graph test]")
     graph.removeNode(node_c);
 
     REQUIRE(graph.numNodes() == 2);
-   
+    
+    std::cout << graph;
+
     //TODO: add graph.clear()
     
     graph_type graph_perf;

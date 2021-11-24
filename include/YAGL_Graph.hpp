@@ -7,6 +7,7 @@
 #include <unordered_map> 
 #include <unordered_set>
 #include <utility> // for pair 
+#include <algorithm> // for the min_element
 
 #include "YAGL_Node.hpp"
 #include "YAGL_Edge.hpp"
@@ -18,7 +19,7 @@ namespace YAGL
 	class Graph;
 
 	template <typename KeyType, typename DataType>
-	std::ostream& operator<<(std::ostream& os, const Graph<KeyType, DataType> &graph);
+	std::ostream& operator<<(std::ostream& os, Graph<KeyType, DataType> &graph);
 	
 	//TODO: should functions be virtual?
 	template <typename KeyType, typename DataType>
@@ -125,12 +126,18 @@ namespace YAGL
 			counting_type out_degree(const Node<KeyType, DataType>& node);
 
 			counting_type degree(const Node<KeyType, DataType>& node);
+			
+			counting_type min_degree();
+			
+			counting_type max_degree();
+
+			double avg_degree();
 
 			bool isDirected();
 
 			bool isUndirected();
 			
-			friend std::ostream &operator<<<>(std::ostream& os, const Graph<KeyType, DataType>& graph);
+			friend std::ostream &operator<<<>(std::ostream& os, Graph<KeyType, DataType>& graph);
 	};
 	
 	template <typename KeyType, typename DataType>
@@ -387,6 +394,73 @@ template <typename KeyType, typename DataType>
 	{
 		return out_neighbors(node).size();
 	}
+	
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::counting_type 
+	Graph<KeyType, DataType>::min_degree() 
+	{
+		//same as std::min_element
+		auto first = adjacency_list_begin();
+		auto last = adjacency_list_end();
+		
+		if(first == last) return 0;
+		
+		auto smallest = first;
+
+		for(; first != last; ++first)
+		{
+			if(first->second.first.size() < smallest->second.first.size())
+			{
+				smallest = first;
+			}
+		}
+
+		return smallest->second.first.size();
+	}
+	
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::counting_type 
+	Graph<KeyType, DataType>::max_degree() 
+	{
+		//same as std::max_element
+		auto first = adjacency_list_begin();
+		auto last = adjacency_list_end();
+		
+		if(first == last) return 0;
+		
+		auto largest = first;
+
+		for(; first != last; ++first)
+		{
+			if(first->second.first.size() > largest->second.first.size())
+			{
+				largest = first;
+			}
+		}
+
+		return largest->second.first.size();
+	}
+	
+	template <typename KeyType, typename DataType>
+	double Graph<KeyType, DataType>::avg_degree() 
+	{
+		auto first = adjacency_list_begin();
+		auto last = adjacency_list_end();
+		
+		if(first == last) return 0;
+		
+		double sum = 0;
+
+		for(; first != last; ++first)
+		{
+			sum += first->second.first.size();
+		}
+		
+		sum /= numNodes();
+		
+		return sum;
+	}
+	
 
 	template <typename KeyType, typename DataType>
 	bool Graph<KeyType, DataType>::isDirected()
@@ -401,10 +475,15 @@ template <typename KeyType, typename DataType>
 	}
 
 	template <typename KeyType, typename DataType>
-	std::ostream& operator<<(std::ostream& os, const Graph<KeyType, DataType>& graph)
+	std::ostream& operator<<(std::ostream& os, Graph<KeyType, DataType>& graph)
 	{
-		os << "Graph: {\n" 
-			 << "\tEmpty Graph Class\n"
+		os << "Current Graph Info: {\n" 
+			 << "\tUndirected: " << graph.isUndirected() << "\n"
+			 << "\t# of Nodes: " << graph.numNodes() << "\n"
+			 << "\t# of Edges: " << graph.numEdges() << "\n"
+			 << "\tMin Degree: " << graph.min_degree() << "\n"
+			 << "\tMax Degree: " << graph.max_degree() << "\n"
+			 << "\tAvg Degree: " << graph.avg_degree() << "\n"
 			 << "}\n";
 		return os;
 	}
