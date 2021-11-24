@@ -2,75 +2,205 @@
 
 #include "catch.hpp"
 #include "YAGL_Graph.hpp"
-
+#include <vector>
 #include <type_traits>
 
-TEST_CASE("Running Graph Test", "[graph test]")
-{    
-    using key_type = int;
-    using data_type = double;
-
+TEST_CASE("graphs can add or remove nodes and duplicate check", "[graph_test]")
+{
+    // Define the graph types
+    using key_type = int; using data_type = double;
     using graph_type = YAGL::Graph<key_type, data_type>;
 
     graph_type graph;
 
-    std::cout << graph;
-
+    //Graph starts out empty
     REQUIRE(graph.numNodes() == 0);
-    
-    //create a node
+    REQUIRE(graph.numEdges() == 0);
+   
+    // Define the node type
     using node_type = YAGL::Node<key_type, data_type>;
+        
+    SECTION("adding nodes increases the number of nodes") {
+
+        //create a node
+        using node_type = YAGL::Node<key_type, data_type>;
+        
+        auto num_nodes = 4;
+        auto num_edges = 0;
+
+        node_type node_a(1, 2.6);
+        node_type node_b(2, 2.6);
+        node_type node_c(4, 2.6);
+        node_type node_d(606, 2.6);
+
+        graph.addNode(node_a);
+        graph.addNode(node_b);
+        graph.addNode(node_c);
+        graph.addNode(node_d);
+            
+        REQUIRE(graph.numNodes() == num_nodes);
+        REQUIRE(graph.numEdges() == num_edges); 
+    }
+
+    SECTION("adding duplicate nodes does not work") {
+
+        //create a node
+        using node_type = YAGL::Node<key_type, data_type>;
+        
+        auto num_unique_keys = 3;
+        auto num_edges = 0;
+
+        node_type node_a(1, 2.6);
+        node_type node_b(2, 2.6);
+        node_type node_c(3, 2.6);
+        node_type node_d(2, 2.6);
+
+        graph.addNode(node_a);
+        graph.addNode(node_b);
+        graph.addNode(node_c);
+        graph.addNode(node_d);
+            
+        REQUIRE(graph.numNodes() == num_unique_keys);
+        REQUIRE(graph.numEdges() == num_edges); 
+    }
     
-    key_type key_a = 101;
-    data_type data_a = 2.6;
-    node_type node_a(key_a, data_a);
+    SECTION("deleting a node decreases the number of nodes") {
 
-    key_type key_b = 101;
-    data_type data_b = 3.6;
-    node_type node_b(key_b, data_b);
+        //create a node
+        using node_type = YAGL::Node<key_type, data_type>;
+        
+        auto num_nodes = 2;
+        auto num_edges = 0;
 
-    key_type key_c = 2;
-    data_type data_c = 2.6;
-    node_type node_c(key_c, data_c);
+        node_type node_a(1, 2.6);
+        node_type node_b(2, 2.6);
+        node_type node_c(4, 2.6);
+        node_type node_d(606, 2.6);
+
+        graph.addNode(node_a);
+        graph.addNode(node_b);
+        graph.addNode(node_c);
+        graph.addNode(node_d);
+        
+        graph.removeNode(node_b);
+        graph.removeNode(node_d);
+
+        REQUIRE(graph.numNodes() == num_nodes);
+        REQUIRE(graph.numEdges() == num_edges); 
+    }
+
+}
+
+TEST_CASE("graphs can and or remove edges and degree can be checked", "[graph_test]")
+{    
+    // Define the graph types
+    using key_type = int; using data_type = double;
+    using graph_type = YAGL::Graph<key_type, data_type>;
+
+    graph_type graph;
+
+    //Graph starts out empty
+    REQUIRE(graph.numNodes() == 0);
+    REQUIRE(graph.numEdges() == 0);
+   
+    // Define the node type
+    using node_type = YAGL::Node<key_type, data_type>;
+        
+    SECTION("edges can be added and degrees checked") {
+
+        //create a node
+        using node_type = YAGL::Node<key_type, data_type>;
+        
+        auto num_nodes = 4;
+        auto num_edges = 2;
+
+        node_type node_a(1, 2.6);
+        node_type node_b(2, 2.6);
+        node_type node_c(4, 2.6);
+        node_type node_d(606, 2.6);
+
+        graph.addNode(node_a);
+        graph.addNode(node_b);
+        graph.addNode(node_c);
+        graph.addNode(node_d);
+            
+        REQUIRE(graph.numNodes() == num_nodes);
+        REQUIRE(graph.numEdges() == 0);
+
+        graph.addEdge(node_a, node_c);
+        REQUIRE( graph.in_degree(node_a) == 1 );
+        REQUIRE( graph.out_degree(node_a) == 1 );
+        REQUIRE( graph.in_degree(node_c) == 1 );
+        REQUIRE( graph.out_degree(node_c) == 1 );
+        
+        REQUIRE( graph.numEdges() == 1 );
+
+        graph.addEdge(node_a, node_d);
+        REQUIRE( graph.in_degree(node_a) == 2 );
+        REQUIRE( graph.out_degree(node_a) == 2 );
+        REQUIRE( graph.in_degree(node_d) == 1 );
+        REQUIRE( graph.out_degree(node_d) == 1 );
+
+        REQUIRE(graph.numEdges() == num_edges);
+    }
     
-    key_type key_e = 3;
-    data_type data_e = 4.2;
-    node_type node_e(key_e, data_e);
-    graph.addNode(node_a);
-    graph.addNode(node_b);
-    graph.addNode(node_c);
-    graph.addNode(node_e);
+    SECTION("edges can be removed and degrees checked") {
 
-    REQUIRE(graph.numNodes() == 3);
+        //create a node
+        using node_type = YAGL::Node<key_type, data_type>;
+        
+        auto num_nodes = 4;
+        auto num_edges = 2;
+
+        node_type node_a(1, 2.6);
+        node_type node_b(2, 2.6);
+        node_type node_c(4, 2.6);
+        node_type node_d(606, 2.6);
+
+        graph.addNode(node_a);
+        graph.addNode(node_b);
+        graph.addNode(node_c);
+        graph.addNode(node_d);
+            
+        REQUIRE(graph.numNodes() == num_nodes);
+        REQUIRE(graph.numEdges() == 0);
+
+        graph.addEdge(node_a, node_c);
+        REQUIRE( graph.in_degree(node_a) == 1 );
+        REQUIRE( graph.out_degree(node_a) == 1 );
+        REQUIRE( graph.in_degree(node_c) == 1 );
+        REQUIRE( graph.out_degree(node_c) == 1 );
+        
+        REQUIRE( graph.numEdges() == 1 );
+
+        graph.addEdge(node_a, node_d);
+        REQUIRE( graph.in_degree(node_a) == 2 );
+        REQUIRE( graph.out_degree(node_a) == 2 );
+        REQUIRE( graph.in_degree(node_d) == 1 );
+        REQUIRE( graph.out_degree(node_d) == 1 );
+
+        REQUIRE(graph.numEdges() == num_edges);
     
-    graph.addEdge(node_a, node_c);
-    REQUIRE( graph.in_degree(node_a) == 1 );
-    REQUIRE( graph.out_degree(node_a) == 1 );
-    REQUIRE( graph.in_degree(node_c) == 1 );
-    REQUIRE( graph.out_degree(node_c) == 1 );
+        graph.removeEdge(node_d, node_a);
     
-    REQUIRE( graph.numEdges() == 1 );
+        REQUIRE(graph.numEdges() == 1);
 
-    graph.addEdge(node_a, node_e);
-    REQUIRE( graph.in_degree(node_a) == 2 );
-    REQUIRE( graph.out_degree(node_a) == 2 );
-    REQUIRE( graph.in_degree(node_e) == 1 );
-    REQUIRE( graph.out_degree(node_e) == 1 );
+        graph.removeNode(node_c);
 
-    REQUIRE(graph.numEdges() == 2);
-
-    graph.removeEdge(node_e, node_a);
+        REQUIRE(graph.numNodes() == 3);
+        REQUIRE(graph.numEdges() == 0);
+    }
+}
+//TODO: add graph.clear()
     
-    REQUIRE(graph.numEdges() == 1);
+TEST_CASE("graph insertion performance test", "[graph_performance_test]")
+{
+    // Define the graph types
+    using key_type = int; using data_type = double;
+    using node_type = YAGL::Node<key_type, data_type>;
 
-    graph.removeNode(node_c);
+    using graph_type = YAGL::Graph<key_type, data_type>;
 
-    REQUIRE(graph.numNodes() == 2);
-    
-    std::cout << graph;
-
-    //TODO: add graph.clear()
-    
     graph_type graph_perf;
 
     //TODO: add this to a performance test
