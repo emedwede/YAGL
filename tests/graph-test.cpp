@@ -198,8 +198,47 @@ TEST_CASE("graphs can and or remove edges and degree can be checked", "[graph_te
         REQUIRE(graph.numEdges() == 2);
     }
 }
-//TODO: add graph.clear()
+
+TEST_CASE("graphs can be completely cleared", "[graph_test]")
+{    
+    // Define the graph types
+    using key_type = int; using data_type = double;
+    using graph_type = YAGL::Graph<key_type, data_type>;
+
+    graph_type graph;
+
+    // Define the node type
+    using node_type = YAGL::Node<key_type, data_type>;
+        
+
+    auto num_nodes = 4;
+    auto num_edges = 6;
+
+    node_type node_a(366, 2.6);
+    node_type node_b(2, 2.6);
+    node_type node_c(4, 2.6);
+    node_type node_d(606, 2.6);
+
+    graph.addNode(node_a);
+    graph.addNode(node_b);
+    graph.addNode(node_c);
+    graph.addNode(node_d);
+        
+    graph.addEdge(node_a, node_c);
+    graph.addEdge(node_a, node_d);
+    graph.addEdge(node_a, node_b);
+    graph.addEdge(node_b, node_c);
+    graph.addEdge(node_b, node_d);
+    graph.addEdge(node_c, node_d);
+
+    graph.clear();
+
+    REQUIRE(graph.numNodes() == 0);
+    REQUIRE(graph.numEdges() == 0);
     
+    std::cout << graph;
+}
+
 TEST_CASE("graph insertion performance test", "[graph_performance_test]")
 {
     // Define the graph types

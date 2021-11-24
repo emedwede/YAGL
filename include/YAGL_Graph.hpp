@@ -137,6 +137,8 @@ namespace YAGL
 
 			bool isUndirected();
 			
+			void clear();
+
 			friend std::ostream &operator<<<>(std::ostream& os, Graph<KeyType, DataType>& graph);
 	};
 	
@@ -488,6 +490,16 @@ template <typename KeyType, typename DataType>
 	{
 		return undirected;
 	}
+	
+	template <typename KeyType, typename DataType>
+	void Graph<KeyType, DataType>::clear()
+	{
+		node_list.clear();
+		edge_list.clear();
+		adjacency_list.clear();
+		num_edges = 0;
+	}
+
 
 	template <typename KeyType, typename DataType>
 	std::ostream& operator<<(std::ostream& os, Graph<KeyType, DataType>& graph)
