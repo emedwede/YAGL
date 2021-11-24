@@ -183,6 +183,8 @@ TEST_CASE("graphs can and or remove edges and degree can be checked", "[graph_te
         REQUIRE( graph.out_degree(node_a) == 3 );
         REQUIRE( graph.in_degree(node_d) == 3 );
         REQUIRE( graph.out_degree(node_d) == 3 );
+        
+        std::cout << graph;
 
         REQUIRE(graph.numEdges() == num_edges);
     
@@ -215,8 +217,14 @@ TEST_CASE("graph insertion performance test", "[graph_performance_test]")
         graph_perf.addNode(n);
     }
     
+    for(auto i = 0; i < num_adds/2; i++) {
+        auto node_a = graph_perf.findNode(i)->second;
+        auto node_b = graph_perf.findNode(i+1)->second;
+        graph_perf.addEdge(node_a, node_b);
+    }
     REQUIRE(graph_perf.numNodes() == num_adds);
-    
+    REQUIRE(graph_perf.numEdges() == num_adds/2);
+
     REQUIRE( graph_perf.findNode(100'000) == graph_perf.node_list_end() );
     
     auto search = graph_perf.findNode(101);
@@ -226,5 +234,7 @@ TEST_CASE("graph insertion performance test", "[graph_performance_test]")
     REQUIRE( node_d.getData() == node_d.getKey()*1.1 );
     
     auto nbr_list = graph_perf.out_neighbors(node_d);
-    REQUIRE(nbr_list.size() == 0);
+    REQUIRE(nbr_list.size() == 2);
+
+    std::cout << graph_perf;
 }
