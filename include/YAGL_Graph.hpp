@@ -104,9 +104,13 @@ namespace YAGL
 			void setEdge();
 
 			void addEdge(const Node<KeyType, DataType>& node_a, const Node<KeyType, DataType>& node_b);
+			
+			void addEdge(const KeyType key_a, const KeyType key_b);
 
 			void removeEdge(const Node<KeyType, DataType>& node_a, const Node<KeyType, DataType>& node_b);
 			
+			void removeEdge(const KeyType key_a, const KeyType key_b);
+
 			void setNodeSet();
 
 			void getNodeSet();
@@ -293,6 +297,45 @@ template <typename KeyType, typename DataType>
 		}
 
 	}
+	
+	template <typename KeyType, typename DataType>
+	void Graph<KeyType, DataType>::addEdge(const KeyType key_a,
+																				 const KeyType key_b)
+	{
+		//we don't do any constraint checks for self-directed edges 
+		auto iter_a = findNode(key_a);
+		if(iter_a == node_list_end())
+		{
+			return; // don't add anything	
+		}
+
+		auto iter_b = findNode(key_b);
+		if(iter_b == node_list_end())
+		{
+			return; // don't add anything	
+		}
+		
+		auto node_a = iter_a->second;
+		auto node_b = iter_b->second;
+
+		auto old_size_a = out_neighbors(node_a).size();
+		auto old_size_b = out_neighbors(node_b).size();
+
+		out_neighbors(node_a).insert(node_b.getKey());
+		in_neighbors(node_a).insert(node_b.getKey());
+
+		out_neighbors(node_b).insert(node_a.getKey());
+		in_neighbors(node_b).insert(node_a.getKey());
+
+		auto new_size_a = out_neighbors(node_a).size();
+		auto new_size_b = out_neighbors(node_b).size();
+		
+		if(new_size_a > old_size_a && new_size_b > old_size_b) 
+		{
+			num_edges++;
+		}
+
+	}
 
 	template <typename KeyType, typename DataType>
 	void Graph<KeyType, DataType>::removeEdge(const Node<KeyType, DataType>& node_a,
@@ -328,6 +371,45 @@ template <typename KeyType, typename DataType>
 			num_edges--;
 		}
 	}
+	
+	template <typename KeyType, typename DataType>
+	void Graph<KeyType, DataType>::removeEdge(const KeyType key_a,
+																						const KeyType key_b)
+	{
+		//we don't do any constraint checks for self-directed edges 
+		auto iter_a = findNode(key_a);
+		if(iter_a == node_list_end())
+		{
+			return; //cannot remove what does not exist
+		}
+
+		auto iter_b = findNode(key_b);
+		if(iter_b == node_list_end())
+		{
+			return; //cannot remove what does not exist
+		}
+		
+		auto node_a = iter_a->second;
+		auto node_b = iter_b->second;
+
+		auto old_size_a = out_neighbors(node_a).size();
+		auto old_size_b = out_neighbors(node_b).size();
+
+		out_neighbors(node_a).erase(node_b.getKey());
+		in_neighbors(node_a).erase(node_b.getKey());
+
+		out_neighbors(node_b).erase(node_a.getKey());
+		in_neighbors(node_b).erase(node_a.getKey());
+
+		auto new_size_a = out_neighbors(node_a).size();
+		auto new_size_b = out_neighbors(node_b).size();
+		
+		if(new_size_a < old_size_a && new_size_b < old_size_b) 
+		{
+			num_edges--;
+		}
+	}
+
 
 	template <typename KeyType, typename DataType>
 	void Graph<KeyType, DataType>::setNodeSet()

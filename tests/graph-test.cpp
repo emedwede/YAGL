@@ -197,6 +197,60 @@ TEST_CASE("graphs can and or remove edges and degree can be checked", "[graph_te
         REQUIRE(graph.numNodes() == 3);
         REQUIRE(graph.numEdges() == 2);
     }
+
+    SECTION("alternative interface to add and remove edges") {
+        //create a node
+        using node_type = YAGL::Node<key_type, data_type>;
+        
+        auto num_nodes = 4;
+        auto num_edges = 6;
+
+        node_type node_a(366, 2.6);
+        node_type node_b(2, 2.6);
+        node_type node_c(4, 2.6);
+        node_type node_d(606, 2.6);
+
+        graph.addNode(node_a);
+        graph.addNode(node_b);
+        graph.addNode(node_c);
+        graph.addNode(node_d);
+            
+        REQUIRE(graph.numNodes() == num_nodes);
+        REQUIRE(graph.numEdges() == 0);
+
+        graph.addEdge(366, 4);
+        REQUIRE( graph.in_degree(node_a) == 1 );
+        REQUIRE( graph.out_degree(node_a) == 1 );
+        REQUIRE( graph.in_degree(node_c) == 1 );
+        REQUIRE( graph.out_degree(node_c) == 1 );
+        
+        REQUIRE( graph.numEdges() == 1 );
+
+        graph.addEdge(366, 606);
+        graph.addEdge(366, 2);
+        graph.addEdge(2, 4);
+        graph.addEdge(2, 606);
+        graph.addEdge(4, 606);
+
+        REQUIRE( graph.in_degree(node_a) == 3 );
+        REQUIRE( graph.out_degree(node_a) == 3 );
+        REQUIRE( graph.in_degree(node_d) == 3 );
+        REQUIRE( graph.out_degree(node_d) == 3 );
+        
+        std::cout << graph;
+
+        REQUIRE(graph.numEdges() == num_edges);
+    
+        graph.removeEdge(606, 366);
+    
+        REQUIRE(graph.numEdges() == num_edges-1);
+
+        graph.removeNode(node_c);
+
+        REQUIRE(graph.numNodes() == 3);
+        REQUIRE(graph.numEdges() == 2);
+
+    }
 }
 
 TEST_CASE("graphs can be completely cleared", "[graph_test]")
