@@ -88,12 +88,26 @@ namespace YAGL
 			
 			node_set_nbr_iterator out_neighbors_begin(const Node<KeyType, DataType>& node);
 			node_set_nbr_iterator out_neighbors_end(const Node<KeyType, DataType>& node);
+			
+			//Key accesible versions
+			node_set_nbr_iterator out_neighbors_begin(KeyType key);
+			node_set_nbr_iterator out_neighbors_end(KeyType key);
 
 			node_set_nbr_iterator in_neighbors_begin(const Node<KeyType, DataType>& node);
 			node_set_nbr_iterator in_neighbors_end(const Node<KeyType, DataType>& node);
 			
+			//Key accesible versions
+			node_set_nbr_iterator in_neighbors_begin(KeyType key);
+			node_set_nbr_iterator in_neighbors_end(KeyType key);
+			
+
 			node_set_type& out_neighbors(const Node<KeyType, DataType>& node);
 			node_set_type& in_neighbors(const Node<KeyType, DataType>& node);
+
+			//Key accesible versions
+			node_set_type& out_neighbors(KeyType key);
+			node_set_type& in_neighbors(KeyType key);
+
 
 			void setEdgeset(/* Needs to take in an edge set*/);
 			
@@ -209,11 +223,34 @@ template <typename KeyType, typename DataType>
 	{
 		return out_neighbors(node).end();
 	}
+	
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_set_nbr_iterator 
+	Graph<KeyType, DataType>::out_neighbors_begin(KeyType key)
+	{
+		return out_neighbors(key).begin();
+	}
+	
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_set_nbr_iterator
+	Graph<KeyType, DataType>::out_neighbors_end(KeyType key)
+	{
+		return out_neighbors(key).end();
+	}
+
 
 	template <typename KeyType, typename DataType>
 	typename Graph<KeyType, DataType>::node_set_type& 
 	Graph<KeyType, DataType>::out_neighbors(const Node<KeyType, DataType> &node)
 	{
+		return adjacency_list.find(node.getKey())->second.first; 
+	}
+	
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_set_type& 
+	Graph<KeyType, DataType>::out_neighbors(KeyType key)
+	{
+		auto node = findNode(key)->second;
 		return adjacency_list.find(node.getKey())->second.first; 
 	}
 
@@ -232,11 +269,34 @@ template <typename KeyType, typename DataType>
 	}
 	
 	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_set_nbr_iterator 
+	Graph<KeyType, DataType>::in_neighbors_begin(KeyType key)
+	{
+		return in_neighbors(key).begin();
+	}
+
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_set_nbr_iterator
+	Graph<KeyType, DataType>::in_neighbors_end(KeyType key)
+	{
+		return in_neighbors(key).end();
+	}
+	
+	template <typename KeyType, typename DataType>
 	typename Graph<KeyType, DataType>::node_set_type&
 	Graph<KeyType, DataType>::in_neighbors(const Node<KeyType, DataType> &node)
 	{
 		return adjacency_list.find(node.getKey())->second.second;
+	}	
+
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_set_type&
+	Graph<KeyType, DataType>::in_neighbors(KeyType key)
+	{
+		auto node = findNode(key)->second;
+		return adjacency_list.find(node.getKey())->second.second;
 	}
+
 
 	template <typename KeyType, typename DataType>
 	void Graph<KeyType, DataType>::setEdgeset()
