@@ -153,3 +153,49 @@ TEST_CASE("iterative breadth first search", "[bfs_test]")
         REQUIRE(visited.size() == graph.numNodes());
     }
 }
+
+TEST_CASE("connected component search test", "[connected_component_test]")
+{    
+    // Define the graph types
+    using key_type = int; using data_type = double;
+    using graph_type = YAGL::Graph<key_type, data_type>;
+
+    graph_type graph;
+    
+    create_complete_k4_graph(graph);
+    
+    std::cout << graph;
+    
+    //search for connected components 
+    {
+        auto component_count = YAGL::connected_components(graph);
+        REQUIRE(component_count == 1);
+    }
+    //add a disconnected component
+    graph.addNode({4, 0.0}); graph.addNode({5, 0.0});
+    graph.addEdge(4, 5);
+    
+    std::cout << graph;
+    
+    //search for connected components 
+    {
+        auto component_count = YAGL::connected_components(graph);
+        REQUIRE(component_count == 2);
+    }
+    
+    //remove some edges to disconnect it 
+    graph.removeEdge(0, 3);
+    graph.removeEdge(0, 2);
+    graph.removeEdge(1, 3);
+    graph.removeEdge(1, 2);
+    
+    std::cout << graph;
+    
+    //search for connected components 
+    {
+        auto component_count = YAGL::connected_components(graph);
+        REQUIRE(component_count == 3);
+    }
+}
+
+

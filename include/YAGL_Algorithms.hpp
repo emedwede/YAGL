@@ -25,10 +25,12 @@ recursive_dfs(GraphType& graph, typename GraphType::key_type v)
 	
 	//Unordered set is just one way
 	std::unordered_set<typename GraphType::key_type> visited;
-	
+	std::vector<typename GraphType::key_type> path;
+
 	//run the implementation
+	impl_recursive_dfs(graph, v, visited, path);
 	std::cout << "Recursive DFS Path: ";
-	impl_recursive_dfs(graph, v, visited);
+	for(auto v : path) std::cout << v << " ";
 	std::cout << std::endl;
 	return visited;
 }
@@ -37,13 +39,13 @@ recursive_dfs(GraphType& graph, typename GraphType::key_type v)
 template <typename GraphType>
 void impl_recursive_dfs(GraphType& graph, 
 		typename GraphType::key_type v, 
-		std::unordered_set<typename GraphType::key_type>& visited)
+		std::unordered_set<typename GraphType::key_type>& visited,
+		std::vector<typename GraphType::key_type>& path)
 {
 	//mark the current node as found 
 	visited.insert(v);
+	path.push_back(v);
 
-	std::cout << v << " ";
-	
 	// do for every edge (v, u)
 	for(auto i = graph.out_neighbors_begin(v); i != graph.out_neighbors_end(v); i++)
 	{
@@ -51,7 +53,7 @@ void impl_recursive_dfs(GraphType& graph,
 
 		if(visited.find(u) == visited.end()) //not found we need to search it 
 		{
-			impl_recursive_dfs(graph, u, visited);
+			impl_recursive_dfs(graph, u, visited, path);
 		}
 	}
 }
@@ -61,9 +63,11 @@ std::unordered_set<typename GraphType::key_type>
 iterative_dfs(GraphType& graph, typename GraphType::key_type v)
 {
 	std::unordered_set<typename GraphType::key_type> visited;
-
+	std::vector<typename GraphType::key_type> path;
+	
+	impl_iterative_dfs(graph, v, visited, path);
 	std::cout << "Iterative DFS Path: ";
-	impl_iterative_dfs(graph, v, visited);
+	for(auto v : path) std::cout << v << " ";
 	std::cout << std::endl;
 
 	return visited;
@@ -72,7 +76,8 @@ iterative_dfs(GraphType& graph, typename GraphType::key_type v)
 template <typename GraphType>
 void impl_iterative_dfs(GraphType& graph, 
 		typename GraphType::key_type v,
-		std::unordered_set<typename GraphType::key_type>& visited)
+		std::unordered_set<typename GraphType::key_type>& visited,
+		std::vector<typename GraphType::key_type>& path)
 {
 	//create the stack for our search
 	std::stack<typename GraphType::key_type> q;
@@ -91,7 +96,7 @@ void impl_iterative_dfs(GraphType& graph,
 		//too print only if not visited 
 		if(visited.find(v) == visited.end())
 		{
-			std::cout << v << " ";
+			path.push_back(v);
 			visited.insert(v);
 		}
 		//do this for every edge (v, u)
@@ -113,17 +118,21 @@ iterative_bfs(GraphType& graph, typename GraphType::key_type v)
 {
 	//Unordered set is just one way
 	std::unordered_set<typename GraphType::key_type> visited;
-	
+	std::vector<typename GraphType::key_type> path;
+
+	impl_iterative_bfs(graph, v, visited, path);
 	std::cout << "Iterative BFS Path: ";
-	impl_iterative_bfs(graph, v, visited);
+	for(auto v : path) std::cout << v << " ";
 	std::cout << std::endl;
+
 	return visited;
 }
 
 template <typename GraphType>
 void impl_iterative_bfs(GraphType& graph, 
 		typename GraphType::key_type v, 
-		std::unordered_set<typename GraphType::key_type>& visited)
+		std::unordered_set<typename GraphType::key_type>& visited,
+		std::vector<typename GraphType::key_type>& path)
 {
 	//create the queue for our search
 	std::queue<typename GraphType::key_type> q;
@@ -140,8 +149,8 @@ void impl_iterative_bfs(GraphType& graph,
 		//dequeue the front node and print it 
 		v = q.front();
 		q.pop();
-		std::cout << v << " ";
-		
+		path.push_back(v);
+
 		//do this for every edge (v, u)
 		for(auto i = graph.out_neighbors_begin(v); i != graph.out_neighbors_end(v); i++)
 		{
@@ -154,6 +163,38 @@ void impl_iterative_bfs(GraphType& graph,
 			}
 		}
 	} 
+}
+
+template <typename GraphType>
+std::size_t connected_components(GraphType& graph)
+{
+	std::unordered_set<typename GraphType::key_type> visited;
+	std::vector<std::vector<typename GraphType::key_type>> component_paths;
+
+	std::size_t count = 0; //no connected components found to start
+	for(auto i = graph.node_list_begin(); i != graph.node_list_end(); i++)
+	{
+		auto v = i->first;
+		//node hasn't been visited so it must be the start of a new connected component 
+		if(visited.find(v) == visited.end())
+		{
+			std::vector<typename GraphType::key_type> path;
+			//we could use whatever search method we feel like 
+			impl_iterative_bfs(graph, v, visited, path);
+			component_paths.push_back(path);
+			count++;
+		}
+	}
+	//print paths
+	for(auto path : component_paths)
+	{
+		std::cout << "Path: ";
+		for(auto v : path)
+			std::cout << v << " ";
+		std::cout << std::endl;
+	}
+	
+	return count;
 }
 
 } //end namespace YAGL
