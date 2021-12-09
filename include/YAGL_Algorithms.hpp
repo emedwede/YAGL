@@ -15,6 +15,8 @@
 namespace YAGL
 {
 
+#define DEBUG_PRINT 0 
+
 //starts a recursive depth first search at a particular node v
 template <typename GraphType>
 std::unordered_set<typename GraphType::key_type> 
@@ -29,9 +31,12 @@ recursive_dfs(GraphType& graph, typename GraphType::key_type v)
 
 	//run the implementation
 	impl_recursive_dfs(graph, v, visited, path);
-	std::cout << "Recursive DFS Path: ";
-	for(auto v : path) std::cout << v << " ";
-	std::cout << std::endl;
+	if(DEBUG_PRINT)
+	{
+		std::cout << "Recursive DFS Path: ";
+		for(auto v : path) std::cout << v << " ";
+		std::cout << std::endl;
+	}
 	return visited;
 }
 
@@ -66,10 +71,12 @@ iterative_dfs(GraphType& graph, typename GraphType::key_type v)
 	std::vector<typename GraphType::key_type> path;
 	
 	impl_iterative_dfs(graph, v, visited, path);
-	std::cout << "Iterative DFS Path: ";
-	for(auto v : path) std::cout << v << " ";
-	std::cout << std::endl;
-
+	if(DEBUG_PRINT)
+	{
+		std::cout << "Iterative DFS Path: ";
+		for(auto v : path) std::cout << v << " ";
+		std::cout << std::endl;
+	}
 	return visited;
 }
 
@@ -121,10 +128,12 @@ iterative_bfs(GraphType& graph, typename GraphType::key_type v)
 	std::vector<typename GraphType::key_type> path;
 
 	impl_iterative_bfs(graph, v, visited, path);
-	std::cout << "Iterative BFS Path: ";
-	for(auto v : path) std::cout << v << " ";
-	std::cout << std::endl;
-
+	if(DEBUG_PRINT)
+	{
+		std::cout << "Iterative BFS Path: ";
+		for(auto v : path) std::cout << v << " ";
+		std::cout << std::endl;
+	}
 	return visited;
 }
 
@@ -185,15 +194,17 @@ std::size_t connected_components(GraphType& graph)
 			count++;
 		}
 	}
-	//print paths
-	for(auto path : component_paths)
+	if(DEBUG_PRINT)
 	{
-		std::cout << "Path: ";
-		for(auto v : path)
-			std::cout << v << " ";
-		std::cout << std::endl;
-	}
-	
+		//print paths
+		for(auto path : component_paths)
+		{
+			std::cout << "Path: ";
+			for(auto v : path)
+				std::cout << v << " ";
+			std::cout << std::endl;
+		}
+	}	
 	return count;
 }
 
