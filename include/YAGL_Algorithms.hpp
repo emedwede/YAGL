@@ -27,7 +27,7 @@ recursive_dfs(GraphType& graph, typename GraphType::key_type v)
 	std::unordered_set<typename GraphType::key_type> visited;
 	
 	//run the implementation
-	std::cout << "DFS Path: ";
+	std::cout << "Recursive DFS Path: ";
 	impl_recursive_dfs(graph, v, visited);
 	std::cout << std::endl;
 	return visited;
@@ -57,9 +57,54 @@ void impl_recursive_dfs(GraphType& graph,
 }
 
 template <typename GraphType>
-void iterative_dfs(GraphType& graph)
+std::unordered_set<typename GraphType::key_type>
+iterative_dfs(GraphType& graph, typename GraphType::key_type v)
 {
+	std::unordered_set<typename GraphType::key_type> visited;
 
+	std::cout << "Iterative DFS Path: ";
+	impl_iterative_dfs(graph, v, visited);
+	std::cout << std::endl;
+
+	return visited;
+}
+
+template <typename GraphType>
+void impl_iterative_dfs(GraphType& graph, 
+		typename GraphType::key_type v,
+		std::unordered_set<typename GraphType::key_type>& visited)
+{
+	//create the stack for our search
+	std::stack<typename GraphType::key_type> q;
+	
+	//push the current node to the stack 
+	q.push(v);
+	
+	//loop until the stack is empty 
+	while(!q.empty())
+	{
+		// pop a vertex from the stack to visit
+		v = q.top();
+		q.pop();
+		
+		//stack may contain the same vertex twice so we need 
+		//too print only if not visited 
+		if(visited.find(v) == visited.end())
+		{
+			std::cout << v << " ";
+			visited.insert(v);
+		}
+		//do this for every edge (v, u)
+		for(auto i = graph.out_neighbors_begin(v); i != graph.out_neighbors_end(v); i++)
+		{
+			typename GraphType::key_type u = *i;
+			if(visited.find(u) == visited.end()) // not found yet
+			{
+				// visit it and enqueue it
+				q.push(u);
+			}
+		}
+	} 
 }
 
 template <typename GraphType>
@@ -69,8 +114,9 @@ iterative_bfs(GraphType& graph, typename GraphType::key_type v)
 	//Unordered set is just one way
 	std::unordered_set<typename GraphType::key_type> visited;
 	
+	std::cout << "Iterative BFS Path: ";
 	impl_iterative_bfs(graph, v, visited);
-
+	std::cout << std::endl;
 	return visited;
 }
 
@@ -89,7 +135,6 @@ void impl_iterative_bfs(GraphType& graph,
 	q.push(v);
 	
 	//loop until the queue is empty 
-	std::cout << "BFS Path: ";
 	while(!q.empty())
 	{
 		//dequeue the front node and print it 
@@ -108,7 +153,7 @@ void impl_iterative_bfs(GraphType& graph,
 				q.push(u);
 			}
 		}
-	} std::cout << std::endl;
+	} 
 }
 
 } //end namespace YAGL
