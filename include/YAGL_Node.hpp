@@ -24,7 +24,7 @@ namespace YAGL
 			~Node() = default;
 
 			const KeyType& getKey() const;
-			const DataType& getData() const;
+			DataType& getData();
 
 			bool operator==(const Node<KeyType, DataType>& b) const;
 			bool operator<(const Node<KeyType, DataType>& b) const;
@@ -50,7 +50,7 @@ namespace YAGL
 	}
 
 	template <typename KeyType, typename DataType>
-	const DataType& Node<KeyType, DataType>::getData() const
+	DataType& Node<KeyType, DataType>::getData() 
 	{
 		return data;
 	}
