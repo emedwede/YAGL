@@ -253,7 +253,7 @@ TEST_CASE("graphs can and or remove edges and degree can be checked", "[graph_te
     }
 }
 
-TEST_CASE("graphs can be completely cleared", "[graph_test]")
+TEST_CASE("graphs can be completely cleared and copied", "[graph_test]")
 {    
     // Define the graph types
     using key_type = int; using data_type = double;
@@ -285,11 +285,19 @@ TEST_CASE("graphs can be completely cleared", "[graph_test]")
     graph.addEdge(node_b, node_d);
     graph.addEdge(node_c, node_d);
 
+    graph_type copy_graph;
+    copy_graph = graph;
+
     graph.clear();
 
     REQUIRE(graph.numNodes() == 0);
     REQUIRE(graph.numEdges() == 0);
+    REQUIRE(copy_graph.numNodes() == 4);
+    REQUIRE(copy_graph.numEdges() == 6);
     
+    auto& node_data = copy_graph.findNode(4)->second.getData();
+    REQUIRE(node_data == 2.6);
+
     std::cout << graph;
 }
 
