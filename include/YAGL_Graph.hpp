@@ -496,7 +496,6 @@ template <typename KeyType, typename DataType>
 	{
 		auto out_set = out_neighbors(node);
 		auto in_set = in_neighbors(node);
-		std::cout << "out_set: ";
 		for(auto& elem : out_set)
 		{
 			auto n =findNode(elem)->second;
