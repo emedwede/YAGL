@@ -263,10 +263,9 @@ void extend_graph_isomorphism(GraphType& g1, GraphType& g2, Mtype<GraphType> M,
 		auto& node_v = v->second;
 
 		// if the labels aren't equal, not a candidate 
-		if(node_v.getData() != node_w.getData())
+		if(node_v.getData().type != node_w.getData().type)
 		{
 			node_set2.erase(node_w.getKey());
-			std::cout << "Label mismatch\n";
 		}
 	}
 
@@ -355,7 +354,7 @@ Ltype<GraphType> subgraph_isomorphism(GraphType& g1, GraphType& g2)
 		for(auto& [w, node_w] : g2.getNodeSetRef())
 		{
 			if(g1.in_degree(node_v) <= g2.in_degree(node_w) && g1.out_degree(node_v) <= g2.out_degree(node_w) 
-					&& node_v.getData() == node_w.getData())
+					&& node_v.getData().type == node_w.getData().type)
 			{
 				C[v].insert(w);
 			}

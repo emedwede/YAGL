@@ -8,20 +8,24 @@
 #include <type_traits>
 #include <string> 
 
-void create_complete_k3_graph(YAGL::Graph<int, double>& graph)
+struct NodeType
 {
-    graph.addNode({0, 0.0});
-    graph.addNode({1, 0.0});
-    graph.addNode({2, 0.0});
+    double type;
+};
+void create_complete_k3_graph(YAGL::Graph<int, NodeType>& graph)
+{
+    graph.addNode({0, {0.0}});
+    graph.addNode({1, {0.0}});
+    graph.addNode({2, {0.0}});
 
     graph.addEdge(0, 1);
     graph.addEdge(1, 2);
     graph.addEdge(2, 0);
 }
-void create_complete_k4_graph(YAGL::Graph<int, double>& graph)
+void create_complete_k4_graph(YAGL::Graph<int, NodeType>& graph)
 {
     for(auto i = 0; i < 4; i++)
-        graph.addNode({i, 0.0});
+        graph.addNode({i, {0.0}});
     
     //creates a path graph and then loops it
     for(auto i = 0; i < 3; i++)
@@ -33,11 +37,11 @@ void create_complete_k4_graph(YAGL::Graph<int, double>& graph)
     graph.addEdge(1, 3);
 }
 
-void create_generic_graph1(YAGL::Graph<std::string, double>& graph)
+void create_generic_graph1(YAGL::Graph<std::string, NodeType>& graph)
 {
     std::string tag = "v";
     for(auto i = 1; i <= 5; i++)
-        graph.addNode({tag+std::to_string(i), 0.0});
+        graph.addNode({tag+std::to_string(i), {0.0}});
     
     auto t1 = tag+"1";
     auto t2 = tag+"2";
@@ -67,11 +71,11 @@ void create_generic_graph1(YAGL::Graph<std::string, double>& graph)
     graph.addEdge(t3, t5);
 }
 
-void create_generic_graph2(YAGL::Graph<std::string, double>& graph)
+void create_generic_graph2(YAGL::Graph<std::string, NodeType>& graph)
 {
     std::string tag = "w";
     for(auto i = 1; i <= 5; i++)
-        graph.addNode({tag+std::to_string(i), 0.0});
+        graph.addNode({tag+std::to_string(i), {0.0}});
     
     auto t1 = tag+"1";
     auto t2 = tag+"2";
@@ -105,7 +109,7 @@ void create_generic_graph2(YAGL::Graph<std::string, double>& graph)
 TEST_CASE("isomorphism test k4", "[graph_iso_test_k4]")
 {    
     // Define the graph types
-    using key_type = int; using data_type = double;
+    using key_type = int; using data_type = NodeType;
     using graph_type = YAGL::Graph<key_type, data_type>;
 
     graph_type g1, g2;
@@ -135,7 +139,7 @@ TEST_CASE("isomorphism test k4", "[graph_iso_test_k4]")
 TEST_CASE("isomorphism test generic", "[graph_iso_test_generic]")
 {    
     // Define the graph types
-    using key_type = std::string; using data_type = double;
+    using key_type = std::string; using data_type = NodeType;
     using graph_type = YAGL::Graph<key_type, data_type>;
 
     graph_type g1, g2;
@@ -163,7 +167,7 @@ TEST_CASE("isomorphism test generic", "[graph_iso_test_generic]")
 
 TEST_CASE("subgraph isomorphism test", "[subgraph_iso_test_k3_to_k4]")
 {
-    using key_type = int; using data_type = double;
+    using key_type = int; using data_type = NodeType;
     using graph_type = YAGL::Graph<key_type, data_type>;
 
     graph_type g1, g2;
