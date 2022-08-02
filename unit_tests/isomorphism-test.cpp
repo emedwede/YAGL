@@ -7,6 +7,17 @@
 #include <vector>
 #include <type_traits>
 #include <string> 
+
+void create_complete_k3_graph(YAGL::Graph<int, double>& graph)
+{
+    graph.addNode({0, 0.0});
+    graph.addNode({1, 0.0});
+    graph.addNode({2, 0.0});
+
+    graph.addEdge(0, 1);
+    graph.addEdge(1, 2);
+    graph.addEdge(2, 0);
+}
 void create_complete_k4_graph(YAGL::Graph<int, double>& graph)
 {
     for(auto i = 0; i < 4; i++)
@@ -91,7 +102,7 @@ void create_generic_graph2(YAGL::Graph<std::string, double>& graph)
 }
 
 
-TEST_CASE("isomorphism test k4", "[dfs_test]")
+TEST_CASE("isomorphism test k4", "[graph_iso_test_k4]")
 {    
     // Define the graph types
     using key_type = int; using data_type = double;
@@ -121,7 +132,7 @@ TEST_CASE("isomorphism test k4", "[dfs_test]")
     }
 }
 
-TEST_CASE("isomorphism test generic", "[dfs_test]")
+TEST_CASE("isomorphism test generic", "[graph_iso_test_generic]")
 {    
     // Define the graph types
     using key_type = std::string; using data_type = double;
@@ -150,3 +161,31 @@ TEST_CASE("isomorphism test generic", "[dfs_test]")
     }
 }
 
+TEST_CASE("subgraph isomorphism test", "[subgraph_iso_test_k3_to_k4]")
+{
+    using key_type = int; using data_type = double;
+    using graph_type = YAGL::Graph<key_type, data_type>;
+
+    graph_type g1, g2;
+
+    create_complete_k3_graph(g1);
+    create_complete_k4_graph(g2);
+    
+    std::cout << g1 << g2;
+
+    auto results = subgraph_isomorphism(g1, g2);
+    
+    // the complete graph k3 is subgraph isomorphic to k4 in 24 different ways
+    REQUIRE(results.size() == 24);
+    auto print_key_value = [](const auto& key, const auto& value) {
+        std::cout << "[ "<< key << " -> " << value << " ]";
+    };                                                                                                   
+    for(const auto& isomorphism : results)
+    {
+        std::cout << "Subgraph Isomorphism: { ";
+        for( const auto& [key, value] : isomorphism ) { 
+            print_key_value(key, value); 
+        } std::cout << " }\n"; 
+    }
+
+}

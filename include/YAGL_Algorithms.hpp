@@ -336,6 +336,141 @@ bool preserve_adjacencies(GraphType& g1, GraphType& g2, Mtype<GraphType>& M, Nod
 	return true;
 }
 
+// a dictionary of vertices to set of vertices
+template <typename GraphType>
+using Ctype = std::unordered_map<typename GraphType::key_type, std::unordered_set<typename GraphType::key_type>>;
+
+template<typename GraphType>
+Ltype<GraphType> subgraph_isomorphism(GraphType& g1, GraphType& g2)
+{
+	std::cout << "Running subgraph isomorphism\n";	
+	
+	// let C be an empty dictionary of vertices to sets of vertices 
+	Ctype<GraphType> C{};
+	
+	// for all vertices in G1, build a set of candidates in G2
+	for(auto& [v, node_v] : g1.getNodeSetRef())
+	{
+		C[v] = {};
+		for(auto& [w, node_w] : g2.getNodeSetRef())
+		{
+			if(g1.in_degree(node_v) <= g2.in_degree(node_w) && g1.out_degree(node_v) <= g2.out_degree(node_w) 
+					&& node_v.getData() == node_w.getData())
+			{
+				C[v].insert(w);
+			}
+		}
+	}
+	
+	// let L be an empty list of vertices to vertices aka list of matches 
+	Ltype<GraphType> L{};
+	
+	// let M be an empty dictionary of vertices to vertices aka a match 
+	Mtype<GraphType> M{};
+	
+	// let v be the iterator to the first vertex of G1 
+	auto v_iter = g1.node_list_begin();	
+	
+	extend_subgraph_isomorphism(g1, g2, C, v_iter, M, L);
+
+	return L;
+}
+
+template <typename GraphType, typename NodeTypeIter>
+void extend_subgraph_isomorphism(GraphType& g1, GraphType& g2, 
+		Ctype<GraphType> C, NodeTypeIter v_iter, Mtype<GraphType> M, Ltype<GraphType>& L)
+{
+	auto v = v_iter->first;
+	auto node_v = v_iter->second;
+
+	for(auto& [w, node_w] : g2.getNodeSetRef())
+	{
+		if(C[v].find(w) != C[v].end())
+		{
+			M[v] = w;
+			
+			Ctype<GraphType> N{};
+			
+			for(auto& [x, node_x] : g1.getNodeSetRef())
+			{
+				N[x] = C[x];
+				
+				if(x != v)
+				{
+					N[x].erase(w);
+				}
+			}
+			for(auto& [y, node_y] : g2.getNodeSetRef())
+			{
+				if(y != w)
+				{
+					N[v].erase(y);
+				}
+			}
+			if(refine_subgraph_isomorphism(g1, g2, N, v, w))
+			{
+				auto v_next = v_iter; 
+				v_next++;
+				if(v_next == g1.node_list_end())
+				{
+					L.push_back(M);
+				}
+				else
+				{
+					extend_subgraph_isomorphism(g1, g2, N, v_next, M, L);	
+				}
+			}
+		}
+	}
+}
+
+template <typename GraphType>
+bool refine_subgraph_isomorphism(GraphType& g1, GraphType& g2, Ctype<GraphType>& C, 
+		typename GraphType::key_type v, typename GraphType::key_type w)
+{
+	auto node_v = g1.findNode(v)->second; auto node_w = g2.findNode(w)->second;
+
+	if(g1.in_degree(node_v) > g2.in_degree(node_w) || g1.out_degree(node_v) > g2.out_degree(node_w))
+	{
+		return false;
+	}
+	for(auto& x : g1.in_neighbors(v))
+	{
+		for(auto& [y, node_y] : g2.getNodeSetRef())
+		{
+			if(!g2.adjacent(y, w))
+			{
+				C[x].erase(y);
+			}
+			else
+			{
+				//check edge labels
+			}
+		}
+	}
+	for(auto& x : g1.out_neighbors(v))
+	{
+		for(auto& [y, node_y] : g2.getNodeSetRef())
+		{
+			if(!g2.adjacent(w, y))
+			{
+				C[x].erase(y);
+			} 
+			else
+			{
+				//check edge labels
+			}
+		}
+	}
+
+	for(auto& [x, node_x] : g1.getNodeSetRef())
+	{
+		if(C[x].empty())
+			return false;
+	}
+	return true;
+}
+
 } //end namespace YAGL
 
 #endif
