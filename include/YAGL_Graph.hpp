@@ -107,7 +107,9 @@ namespace YAGL
 			//Key accesible versions
 			node_set_type& out_neighbors(KeyType key);
 			node_set_type& in_neighbors(KeyType key);
-
+			
+			bool adjacent(const KeyType& key_a, const KeyType& key_b);
+			bool adjacent(const Node<KeyType, DataType>& node_a, Node<KeyType, DataType>& node_b);
 
 			void setEdgeset(/* Needs to take in an edge set*/);
 			
@@ -127,7 +129,9 @@ namespace YAGL
 
 			void setNodeSet();
 
-			void getNodeSet();
+			node_list_type getNodeSet();
+			
+			node_list_type& getNodeSetRef();
 
 			void addNode(const Node<KeyType, DataType>& node);
 			
@@ -224,6 +228,24 @@ template <typename KeyType, typename DataType>
 		return out_neighbors(node).end();
 	}
 	
+	template <typename KeyType, typename DataType>
+	bool Graph<KeyType, DataType>::adjacent(const KeyType& key_a, const KeyType& key_b)
+	{
+		auto& node = findNode(key_a)->second;
+		auto& nbrs = out_neighbors(node);
+
+		if(nbrs.find(key_b) != nbrs.end())
+			return true;
+		else 
+			return false;
+	}
+	
+	template<typename KeyType, typename DataType>
+	bool Graph<KeyType, DataType>::adjacent(const Node<KeyType, DataType>& node_a, Node<KeyType, DataType>& node_b)
+	{
+		return true;
+	}
+
 	template <typename KeyType, typename DataType>
 	typename Graph<KeyType, DataType>::node_set_nbr_iterator 
 	Graph<KeyType, DataType>::out_neighbors_begin(KeyType key)
@@ -478,10 +500,17 @@ template <typename KeyType, typename DataType>
 	}
 
 	template <typename KeyType, typename DataType>
-	void Graph<KeyType, DataType>::getNodeSet()
+	typename Graph<KeyType, DataType>::node_list_type Graph<KeyType, DataType>::getNodeSet()
 	{
-
+		return node_list;
 	}
+	
+	template <typename KeyType, typename DataType>
+	typename Graph<KeyType, DataType>::node_list_type& Graph<KeyType, DataType>::getNodeSetRef()
+	{
+		return node_list;
+	}
+
 
 	template <typename KeyType, typename DataType>
 	void Graph<KeyType, DataType>::addNode(const Node<KeyType, DataType>& node)

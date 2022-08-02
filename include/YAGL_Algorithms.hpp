@@ -208,6 +208,132 @@ std::size_t connected_components(GraphType& graph)
 	return count;
 }
 
+template<typename GraphType>
+using Mtype = std::unordered_map<typename GraphType::key_type, typename GraphType::key_type>;
+
+template<typename GraphType>
+using Ltype = std::vector<Mtype<GraphType>>;
+
+template <typename GraphType>
+Ltype<GraphType> graph_isomorphism(GraphType& g1, GraphType& g2)
+{
+	std::cout << "Running graph isomorphism\n";
+
+	// let L be an empty container of dictionaries of nodes to nodes
+	Ltype<GraphType> L{};
+
+	// let M be an empty dictionary of nodes to nodes 
+	Mtype<GraphType> M{};
+	
+	// if G1 and G2 have the same number of vertices and edges, they may be isomorphic
+	if(g1.numNodes() == g2.numNodes() && g1.numEdges() == g2.numEdges())
+	{
+		auto v = g1.node_list_begin();
+		extend_graph_isomorphism(g1, g2, M, v, L);
+	}
+	// return the container L 
+	return L;
+}
+
+template <typename GraphType, typename NodeTypeIter>
+void extend_graph_isomorphism(GraphType& g1, GraphType& g2, Mtype<GraphType> M, 
+		NodeTypeIter v, Ltype<GraphType>& L )
+{
+	// let M' be a copy of M 
+	auto M_prime = M;
+	
+	// get a copy of the vertices of G2
+	auto node_set2 = g2.getNodeSet();
+	
+	// for all vertices v' of G1
+	for(const auto& v_prime : g1.getNodeSetRef())
+	{
+		// if v' is in M' then delete M[v'] from V2
+		auto& node = v_prime.second;
+		if(M_prime.find(node.getKey()) != M_prime.end()) 
+		{
+			node_set2.erase(M[node.getKey()]);
+		}
+	} 
+
+	// for all vertices w of G2 
+	for(auto& w : g2.getNodeSetRef())
+	{
+		auto& node_w = w.second;
+		auto& node_v = v->second;
+
+		// if the labels aren't equal, not a candidate 
+		if(node_v.getData() != node_w.getData())
+		{
+			node_set2.erase(node_w.getKey());
+			std::cout << "Label mismatch\n";
+		}
+	}
+
+	// for all vertices w in V2 
+	for(auto& w : node_set2) 
+	{
+		// check to see if adjecencies are preserved 
+		if(preserve_adjacencies(g1, g2, M_prime, v, w))
+		{
+			// if so, we have a mapping
+			//M_prime.insert({v->first, w.first});
+			M_prime.insert_or_assign(v->first, w.first);
+			// if v is the last vert of G1, then append M' to L 
+			auto v_temp = v;
+			v_temp++;
+			if(v_temp == g1.node_list_end())
+			{
+				L.push_back(M_prime); 
+			}
+			// let v' be the next vertex after v in G1
+			else 
+			{
+				// let v' be the next vertex after v in G1 
+				auto v_prime = ++v; //make sure to do a post fix increment
+				extend_graph_isomorphism(g1, g2, M_prime, v_prime, L);
+			}	
+		}
+	}
+}
+
+template <typename GraphType, typename NodeTypeIter, typename NodeType>
+bool preserve_adjacencies(GraphType& g1, GraphType& g2, Mtype<GraphType>& M, NodeTypeIter& v, NodeType& w)
+{
+	auto node_v = v->second;
+	auto node_w = w.second;
+
+	// if the degree of the nodes aren't the same, no match
+	if(g1.in_degree(node_v) != g2.in_degree(node_w) || g1.out_degree(node_v) != g2.out_degree(node_w))
+	{
+		//std::cout << "Mismatch of in/out degree\n";
+		return false;
+	}
+	// for all edges coming into the vertex v in G1 
+	for(auto& x : g1.in_neighbors(node_v))
+	{
+		// if the src vertex, x, in M and M[x] is not adjecent with w in G2, no match 
+		if(M.find(x) != M.end() && !g2.adjacent(M[x], w.first))
+		{
+			//std::cout << "Adjacency test failed for in neighbors\n";
+			return false;
+		}
+	}
+	// for all edges coming out of the vertex v in G1
+	for(auto& x : g1.out_neighbors(node_v))
+	{
+		// if the target vertex, x, in M and w is not adjecent with M[x] in G2, no match 
+		if(M.find(x) != M.end() && !g2.adjacent(w.first, M[x]))
+		{
+			//std::cout << "Adjacency test failed for out neighbors\n";
+			return false;
+		}
+	}
+	//std::cout << "Adjacency test passed\n";
+	// adjacency is preserved 
+	return true;
+}
+
 } //end namespace YAGL
 
 #endif
