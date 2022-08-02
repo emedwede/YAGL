@@ -276,6 +276,7 @@ void extend_graph_isomorphism(GraphType& g1, GraphType& g2, Mtype<GraphType> M,
 		// check to see if adjecencies are preserved 
 		if(preserve_adjacencies(g1, g2, M_prime, v, w))
 		{
+			//std::cout << v->first << " -> " << w.first << "\n";
 			// if so, we have a mapping
 			//M_prime.insert({v->first, w.first});
 			M_prime.insert_or_assign(v->first, w.first);
@@ -290,7 +291,8 @@ void extend_graph_isomorphism(GraphType& g1, GraphType& g2, Mtype<GraphType> M,
 			else 
 			{
 				// let v' be the next vertex after v in G1 
-				auto v_prime = ++v; //make sure to do a post fix increment
+				auto v_prime = v; 
+				v_prime++;
 				extend_graph_isomorphism(g1, g2, M_prime, v_prime, L);
 			}	
 		}
