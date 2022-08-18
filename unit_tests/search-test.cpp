@@ -22,6 +22,25 @@ void create_complete_k4_graph(YAGL::Graph<int, double>& graph)
     graph.addEdge(1, 3);
 }
 
+//TODO: move to a separate test 
+TEST_CASE("induced_subgraph", "[induced_subgraph test]")
+{
+    using key_type = int; using data_type = double;
+    using graph_type = YAGL::Graph<key_type, data_type>;
+    
+    graph_type graph;
+    create_complete_k4_graph(graph);
+
+    std::vector<key_type> inducing_set{0, 1, 3};
+    auto subgraph = YAGL::induced_subgraph(graph, inducing_set);
+    
+    //any 3 noded induced subgraph of K4 is a K3 graph 
+    REQUIRE(subgraph.numNodes() == 3);
+    REQUIRE(subgraph.numEdges() == 3);
+    REQUIRE(subgraph.min_degree() == 2);
+    REQUIRE(subgraph.max_degree() == 2);
+
+}
 TEST_CASE("recursive depth first search", "[dfs_test]")
 {    
     // Define the graph types
@@ -40,7 +59,20 @@ TEST_CASE("recursive depth first search", "[dfs_test]")
         auto visited = YAGL::recursive_dfs(graph, i);
         REQUIRE(visited.size() == graph.numNodes());
     }
-
+    
+    //run dfs with a modifed depth level 
+    {
+        auto visited = YAGL::recursive_dfs(graph, 0, 0);
+        REQUIRE(visited.size() == graph.numNodes());
+    }
+    {
+        auto visited = YAGL::recursive_dfs(graph, 0, 1);
+        REQUIRE(visited.size() == 1);
+    }
+    {
+        auto visited = YAGL::recursive_dfs(graph, 0, 2);
+        REQUIRE(visited.size() == graph.numNodes());
+    }
     //add a disconnected component
     graph.addNode({4, 0.0}); graph.addNode({5, 0.0});
     graph.addEdge(4, 5);
@@ -49,7 +81,7 @@ TEST_CASE("recursive depth first search", "[dfs_test]")
         auto visited = YAGL::recursive_dfs(graph, 0);
         REQUIRE(visited.size() == graph.numNodes() - 2);
     }
-
+    
     { //Test to see that only the disconnected component is found
         auto visited = YAGL::recursive_dfs(graph, 4);
         REQUIRE(visited.size() == 2);

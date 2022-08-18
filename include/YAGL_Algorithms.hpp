@@ -17,10 +17,32 @@ namespace YAGL
 
 #define DEBUG_PRINT 0 
 
+template <typename GraphType, typename NodeSet>
+GraphType induced_subgraph(GraphType& graph, NodeSet& inducing_set)
+{
+	GraphType subgraph;
+	
+	//first add all of the inducing nodes to the subgraph 
+	for(const auto& u : inducing_set)
+	{
+		auto node_u = graph.findNode(u)->second;
+		subgraph.addNode(node_u);
+	}
+	//next for every node only add an edge if adjecent
+	for(const auto& u : inducing_set)
+	{
+		for(const auto& v : graph.out_neighbors(u))
+		{
+			if(subgraph.findNode(v) != subgraph.node_list_end())
+				subgraph.addEdge(u, v);
+		}
+	}
+	return subgraph;
+}
 //starts a recursive depth first search at a particular node v
 template <typename GraphType>
 std::unordered_set<typename GraphType::key_type> 
-recursive_dfs(GraphType& graph, typename GraphType::key_type v)
+recursive_dfs(GraphType& graph, typename GraphType::key_type v, std::size_t max_depth = 0)
 {
 	//only need size when we're using an vector or array for the visited container
 	//auto n = graph.numNodes();
@@ -28,9 +50,10 @@ recursive_dfs(GraphType& graph, typename GraphType::key_type v)
 	//Unordered set is just one way
 	std::unordered_set<typename GraphType::key_type> visited;
 	std::vector<typename GraphType::key_type> path;
-
+	//a max depth of zero means search with no limit
+	std::size_t cur_depth = 0;
 	//run the implementation
-	impl_recursive_dfs(graph, v, visited, path);
+	impl_recursive_dfs(graph, v, visited, path, cur_depth, max_depth);
 	if(DEBUG_PRINT)
 	{
 		std::cout << "Recursive DFS Path: ";
@@ -45,11 +68,18 @@ template <typename GraphType>
 void impl_recursive_dfs(GraphType& graph, 
 		typename GraphType::key_type v, 
 		std::unordered_set<typename GraphType::key_type>& visited,
-		std::vector<typename GraphType::key_type>& path)
+		std::vector<typename GraphType::key_type>& path,
+		std::size_t cur_depth = 0,
+		std::size_t max_depth = 0)
 {
 	//mark the current node as found 
 	visited.insert(v);
 	path.push_back(v);
+	cur_depth++;
+	if(cur_depth == max_depth)
+		return;
+	else
+		cur_depth++;
 
 	// do for every edge (v, u)
 	for(auto i = graph.out_neighbors_begin(v); i != graph.out_neighbors_end(v); i++)
