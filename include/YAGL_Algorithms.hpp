@@ -71,15 +71,21 @@ void impl_recursive_dfs(GraphType& graph,
 		std::vector<typename GraphType::key_type>& path,
 		std::size_t cur_depth = 0,
 		std::size_t max_depth = 0)
-{
+{	
+	if(DEBUG_PRINT)
+	{
+		std::cout << "max_depth " << max_depth << "\n";
+		std::cout << "cur_depth " << cur_depth << "\n";
+	}
+
 	//mark the current node as found 
 	visited.insert(v);
 	path.push_back(v);
 	cur_depth++;
 	if(cur_depth == max_depth)
 		return;
-	else
-		cur_depth++;
+	//else
+		//cur_depth++;
 
 	// do for every edge (v, u)
 	for(auto i = graph.out_neighbors_begin(v); i != graph.out_neighbors_end(v); i++)
@@ -88,7 +94,7 @@ void impl_recursive_dfs(GraphType& graph,
 
 		if(visited.find(u) == visited.end()) //not found we need to search it 
 		{
-			impl_recursive_dfs(graph, u, visited, path);
+			impl_recursive_dfs(graph, u, visited, path, cur_depth, max_depth);
 		}
 	}
 }

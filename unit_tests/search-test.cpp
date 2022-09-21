@@ -230,4 +230,29 @@ TEST_CASE("connected component search test", "[connected_component_test]")
     }
 }
 
+TEST_CASE("recursive depth first search2", "[dfs_test2]")
+{    
+    // Define the graph types
+    using key_type = int; using data_type = double;
+    using graph_type = YAGL::Graph<key_type, data_type>;
+
+    graph_type graph;
+    
+    graph.addNode({0, 0.0});
+    graph.addNode({1, 0.0});
+    graph.addNode({2, 0.0});
+    graph.addNode({3, 0.0});
+    graph.addNode({4, 0.0});
+    graph.addNode({5, 0.0});
+    graph.addEdge(0, 1);
+    graph.addEdge(1, 2);
+    graph.addEdge(2, 3);
+    graph.addEdge(3, 4); 
+    graph.addEdge(1, 5);
+    std::cout << graph;
+    
+    auto visited = YAGL::recursive_dfs(graph, 1, 0);
+    std::cout << "Visited size: " << visited.size() << "\n";
+}
+
 
