@@ -176,8 +176,9 @@ TEST_CASE("subgraph isomorphism test", "[subgraph_iso_test_k3_to_k4]")
     create_complete_k4_graph(g2);
     
     std::cout << g1 << g2;
-
-    auto results = subgraph_isomorphism(g1, g2);
+    
+    //auto results = subgraph_isomorphism(g1, g2);
+    auto results = subgraph_isomorphism2(g1, g2);
     
     // the complete graph k3 is subgraph isomorphic to k4 in 24 different ways
     REQUIRE(results.size() == 24);

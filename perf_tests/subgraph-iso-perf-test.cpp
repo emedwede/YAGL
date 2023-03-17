@@ -71,7 +71,7 @@ void write_results_matplotlib(std::vector<double>& runtimes, std::vector<std::si
 TEST_CASE("subgraph iso performance test", "[subgraph_iso_performance_test]")
 {
     
-    std::size_t m = 8;
+    std::size_t m = 10;
     std::vector<double> runtimes;
     std::vector<std::size_t> match_counts;
     std::size_t n = 1;
@@ -89,7 +89,8 @@ TEST_CASE("subgraph iso performance test", "[subgraph_iso_performance_test]")
     //std::cout << g1 << g2; 
     std::cout << "Running test for n == " << n << "\n";
     const auto start = std::chrono::high_resolution_clock::now();
-    auto results = YAGL::subgraph_isomorphism(g1, g2);
+    //auto results = YAGL::subgraph_isomorphism(g1, g2);
+    auto results = YAGL::subgraph_isomorphism2(g1, g2);
     const auto end = std::chrono::high_resolution_clock::now();
     const std::chrono::duration<double, std::milli> ms = end - start;
     std::cout << "SubGraphIso: " << std::fixed << std::setprecision(1)
