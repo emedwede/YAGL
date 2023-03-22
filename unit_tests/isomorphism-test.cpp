@@ -118,8 +118,9 @@ TEST_CASE("isomorphism test k4", "[graph_iso_test_k4]")
     create_complete_k4_graph(g2); 
     
     std::cout << g1 << g2;
-
-    auto results = graph_isomorphism(g1, g2);
+    
+    //subgraph alg is compatible with regular isomorphism
+    auto results = subgraph_isomorphism2(g1, g2);
     
     // The complete graph K4 has has 24 automorphisms to itself
     REQUIRE(results.size() == 24);
@@ -148,8 +149,9 @@ TEST_CASE("isomorphism test generic", "[graph_iso_test_generic]")
     create_generic_graph2(g2);
 
     std::cout << g1 << g2;
-
-    auto results = graph_isomorphism(g1, g2);
+    
+    //subgraph alg is compatible with regular isomorphism
+    auto results = subgraph_isomorphism2(g1, g2);
     
     REQUIRE(results.size() == 8);
 
@@ -165,7 +167,40 @@ TEST_CASE("isomorphism test generic", "[graph_iso_test_generic]")
     }
 }
 
-TEST_CASE("subgraph isomorphism test", "[subgraph_iso_test_k3_to_k4]")
+TEST_CASE("subgraph isomorphism test particles", "[subgraph_iso_test_particles]")
+{
+    using key_type = int; using data_type = NodeType;
+    using graph_type = YAGL::Graph<key_type, data_type>;
+
+    graph_type g1, g2;
+    
+    auto num_particles = 10;
+    
+    g1.addNode({1001, {1.001}});
+
+    for(auto i = 0; i < num_particles; i++)
+        g2.addNode({i, {1.001}});
+ 
+    std::cout << g1 << g2;
+    
+    //auto results = subgraph_isomorphism(g1, g2);
+    auto results = subgraph_isomorphism2(g1, g2);
+    
+    // the complete graph k3 is subgraph isomorphic to k4 in 24 different ways
+    REQUIRE(results.size() == num_particles);
+    auto print_key_value = [](const auto& key, const auto& value) {
+        std::cout << "[ "<< key << " -> " << value << " ]";
+    };                                                                                                   
+    for(const auto& isomorphism : results)
+    {
+        std::cout << "Subgraph Isomorphism: { ";
+        for( const auto& [key, value] : isomorphism ) { 
+            print_key_value(key, value); 
+        } std::cout << " }\n"; 
+    }
+
+}
+TEST_CASE("subgraph isomorphism test complete", "[subgraph_iso_test_k3_to_k4]")
 {
     using key_type = int; using data_type = NodeType;
     using graph_type = YAGL::Graph<key_type, data_type>;
