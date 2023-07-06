@@ -1,5 +1,5 @@
 #ifndef YAGL_GRAPH_HPP
-#define YAGL_GRPAH_HPP
+#define YAGL_GRAPH_HPP
 
 #pragma once 
 
