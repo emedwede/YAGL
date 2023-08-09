@@ -29,13 +29,19 @@ namespace YAGL
         return TypeSet<Types...>::is_unique;
     }
     template <typename ... Ts>
-    class VariantNode;
+    class VariantData;
 
     template <typename ... Ts>
-    class VariantNode
+    class VariantData
     {
     public:
-        VariantNode() {
+        VariantData() {
+            static_assert(are_types_unique<Ts ...>(), "Types aren't unique");
+        }
+
+        template <typename T>
+        VariantData(T&& item) : data(item) {
+            type = data.index();
             static_assert(are_types_unique<Ts ...>(), "Types aren't unique");
         }
 
@@ -44,27 +50,48 @@ namespace YAGL
         constexpr auto get_size() { return std::variant_size_v<node_variant_t>;}
 
         template<typename T>
-        void setData(const T&);
+        void setData(T&&);
+
+        template<typename T>
+        T& getData();
 
         auto getTypeIndex() const;
 
-    private:
-        std::size_t typeIndex;
+    //private:
+
+        constexpr std::size_t TypeIndex() const;
+        std::size_t typeIndex, type;
         node_variant_t data;
     };
 
+    // Public Functions
     template <typename ... Ts>
     template <typename T>
-    void VariantNode<Ts ...>::setData(const T& value)
+    void VariantData<Ts ...>::setData(T&& value)
     {
         data = value;
+        type = data.index();
         typeIndex = data.index();
     }
 
     template <typename ... Ts>
-    auto VariantNode<Ts ...>::getTypeIndex() const
+    template <typename T>
+    T& VariantData<Ts ...>::getData()
+    {
+        return std::get<T>(data);
+    }
+
+    template <typename ... Ts>
+    auto VariantData<Ts ...>::getTypeIndex() const
     {
         return typeIndex;
+    }
+
+    // Private Functions
+    template <typename ... Ts>
+    constexpr std::size_t VariantData<Ts ...>::TypeIndex() const
+    {
+        return data.index();
     }
 }
 #endif //YAGL_VARIANT_NODE_HPP

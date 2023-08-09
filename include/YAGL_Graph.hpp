@@ -20,8 +20,7 @@ namespace YAGL
 
 	template <typename KeyType, typename DataType>
 	std::ostream& operator<<(std::ostream& os, Graph<KeyType, DataType> &graph);
-	
-	//TODO: should functions be virtual?
+
 	template <typename KeyType, typename DataType>
 	class Graph
 	{
@@ -33,7 +32,7 @@ namespace YAGL
 			using edge_type = Edge<key_type, data_type>;
 			
 			// Motivation: unordered_set allows for amortized time
-			// 						 constant looup, and ensures keys are unique
+			// 						 constant lookup, and ensures keys are unique
 			//
 			// NOTE: 			 key_types should be hashable and comparable
 			// 						 and provide this if not available by default
@@ -89,14 +88,14 @@ namespace YAGL
 			node_set_nbr_iterator out_neighbors_begin(const Node<KeyType, DataType>& node);
 			node_set_nbr_iterator out_neighbors_end(const Node<KeyType, DataType>& node);
 			
-			//Key accesible versions
+			//Key accessible versions
 			node_set_nbr_iterator out_neighbors_begin(KeyType key);
 			node_set_nbr_iterator out_neighbors_end(KeyType key);
 
 			node_set_nbr_iterator in_neighbors_begin(const Node<KeyType, DataType>& node);
 			node_set_nbr_iterator in_neighbors_end(const Node<KeyType, DataType>& node);
 			
-			//Key accesible versions
+			//Key accessible versions
 			node_set_nbr_iterator in_neighbors_begin(KeyType key);
 			node_set_nbr_iterator in_neighbors_end(KeyType key);
 			
@@ -104,7 +103,7 @@ namespace YAGL
 			node_set_type& out_neighbors(const Node<KeyType, DataType>& node);
 			node_set_type& in_neighbors(const Node<KeyType, DataType>& node);
 
-			//Key accesible versions
+			//Key accessible versions
 			node_set_type& out_neighbors(KeyType key);
 			node_set_type& in_neighbors(KeyType key);
 			
@@ -160,6 +159,8 @@ namespace YAGL
 			bool isUndirected();
 			
 			void clear();
+
+            DataType& operator[](KeyType k) { return findNode(k)->second.getData(); }
 
 			friend std::ostream &operator<<<>(std::ostream& os, Graph<KeyType, DataType>& graph);
 	};
