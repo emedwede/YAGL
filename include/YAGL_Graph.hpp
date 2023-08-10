@@ -168,9 +168,7 @@ namespace YAGL
 	template <typename KeyType, typename DataType>
 	Graph<KeyType, DataType>::Graph() : undirected(true), num_edges(0)
 	{
-		std::cout << "Default graph constructor!\n";
-
-		//node_list.reserve(20'000'000);
+		//std::cout << "Default graph constructor!\n";
 	}
 
 	template <typename KeyType, typename DataType>

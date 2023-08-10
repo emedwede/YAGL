@@ -440,7 +440,7 @@ using Ctype = std::unordered_map<typename GraphType::key_type, std::unordered_se
 template<typename GraphType>
 Ltype<GraphType> subgraph_isomorphism(GraphType& g1, GraphType& g2)
 {
-	std::cout << "Running subgraph isomorphism\n";	
+	//std::cout << "Running subgraph isomorphism\n";
 	
 	// let C be an empty dictionary of vertices to sets of vertices 
 	Ctype<GraphType> C{};
@@ -662,7 +662,7 @@ struct FlatNTree
 template <typename GraphType>
 Ltype<GraphType> subgraph_isomorphism2(GraphType& g1, GraphType& g2)
 {
-	std::cout << "Running subgraph isomorphism\n";
+	//std::cout << "Running subgraph isomorphism\n";
 
 	// let L be an empty container of dictionaries of nodes to nodes
 	Ltype<GraphType> L{};
