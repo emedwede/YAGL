@@ -315,7 +315,7 @@ using Ltype = std::vector<Mtype<GraphType>>;
 template <typename GraphType>
 Ltype<GraphType> graph_isomorphism(GraphType& g1, GraphType& g2)
 {
-	std::cout << "Running graph isomorphism\n";
+	//std::cout << "Running graph isomorphism\n";
 
 	// let L be an empty container of dictionaries of nodes to nodes
 	Ltype<GraphType> L{};
