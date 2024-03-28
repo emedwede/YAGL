@@ -672,7 +672,7 @@ Ltype<GraphType> subgraph_isomorphism2(GraphType& g1, GraphType& g2)
 	Mtype<GraphType> M_inverse{};	
 	//find a dfs orderding for g1 
 	auto path = recursive_dfs2(g1, g1.node_list_begin()->first);
-	
+
 	if(path.size() == 0) return L;
 
 	//build a tree for the preorder traversal
